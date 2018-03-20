@@ -78,7 +78,6 @@ BEGIN
 		('HarperCollins', '195 Broadway, New York City, NY', '448-985-4367'),
 		('Doubleday', '96 1st Ave, New York City, NY', '874-852-5584')
 	;
-	SELECT * FROM PUBLISHER;
 
 
 	INSERT INTO BOOK
@@ -105,7 +104,6 @@ BEGIN
 		('The Pelican Brief', 'John Grisham', 'Doubleday'),
 		('The Da Vinci Code', 'Dan Brown', 'Doubleday')
 	;
-	SELECT * FROM BOOK;
 
 
 	INSERT INTO LIBRARY_BRANCH
@@ -116,7 +114,6 @@ BEGIN
 		('Northwest', '62 NW 48th Ave, Ely, GA'),
 		('Kennedy', '121 1st Ave, Ely, GA')
 	;
-	SELECT * FROM LIBRARY_BRANCH;
 
 
 	INSERT INTO BOOK_COPIES
@@ -178,7 +175,6 @@ BEGIN
 		(19, 1, 3),
 		(20, 3, 4)
 	;
-	SELECT * FROM BOOK_COPIES;
 
 
 	INSERT INTO BORROWER
@@ -194,7 +190,6 @@ BEGIN
 		('Jose Coates', '301 Tuna St, Ely, GA', '201-480-6005'),
 		('Jake Martinez', '487 Dogfish St, Ely, GA', '101-910-0036')
 	;
-	SELECT * FROM BORROWER;
 
 
 	INSERT INTO BOOK_LOANS
@@ -251,7 +246,6 @@ BEGIN
 		('2018-02-25', '2018-03-25', 6, 8, 2),
 		('2018-02-25', '2018-03-25', 6, 17, 2)
 	;
-	SELECT * FROM BOOK_LOANS;
 
 	/************************
 	 END populating tables 
@@ -264,21 +258,21 @@ BEGIN
 	--> 1. How many copies of the book titled "The Lost Tribe" are owned by the library branch whose name is "Sharpstown"?
 
 	SELECT
-		bookTitle AS 'Book Title:', branchName AS 'Branch:', No_Of_Copies AS 'Number of Copies:'
-		FROM BOOK
-		INNER JOIN BOOK_COPIES ON copies_bookId = bookId
-		INNER JOIN LIBRARY_BRANCH ON branchId = copies_branchId
-		WHERE bookTitle = 'The Lost Tribe' AND branchName = 'Sharpstown'
+		a1.bookTitle AS 'Book Title:', a3.branchName AS 'Branch:', a2.No_Of_Copies AS 'Number of Copies:'
+		FROM BOOK a1
+		INNER JOIN BOOK_COPIES a2 ON a2.copies_bookId = a1.bookId
+		INNER JOIN LIBRARY_BRANCH a3 ON a3.branchId = a2.copies_branchId
+		WHERE a1.bookTitle = 'The Lost Tribe' AND a3.branchName = 'Sharpstown'
 	;
 
 	--> 2. How many copies of the book titled "The Lost Tribe" are owned by each library branch?
 
 	SELECT
-		branchName AS 'Branch:', bookTitle AS 'Book Title:', No_Of_Copies AS 'Number of Copies:'
-		FROM BOOK
-		INNER JOIN BOOK_COPIES ON copies_bookId = bookId
-		INNER JOIN LIBRARY_BRANCH ON branchId = copies_branchId
-		WHERE bookTitle = 'The Lost Tribe'
+		a3.branchName AS 'Branch:', a1.bookTitle AS 'Book Title:', a2.No_Of_Copies AS 'Number of Copies:'
+		FROM BOOK a1
+		INNER JOIN BOOK_COPIES a2 ON a2.copies_bookId = a1.bookId
+		INNER JOIN LIBRARY_BRANCH a3 ON a3.branchId = a2.copies_branchId
+		WHERE a1.bookTitle = 'The Lost Tribe'
 	;
 
 	--> 3. Retrieve the names of all borrowers who do not have any books checked out.
@@ -293,32 +287,32 @@ BEGIN
 		  retrieve the book title, the borrower's name, and the borrower's address.*/
 
 	SELECT
-		bookTitle AS 'Book Title:', borrowName AS 'Borrowers Name:', borrowAddress AS 'Borrowers Address:'
-		FROM BOOK
-		INNER JOIN BOOK_COPIES ON copies_bookId = bookId
-		INNER JOIN BOOK_LOANS ON loans_bookId = bookId
-		INNER JOIN BORROWER ON cardNo = loans_cardNo
-		WHERE copies_branchId = 1 AND dueDate = '2018-03-19'
+		a1.bookTitle AS 'Book Title:', a4.borrowName AS 'Borrowers Name:', a4.borrowAddress AS 'Borrowers Address:'
+		FROM BOOK a1
+		INNER JOIN BOOK_COPIES a2 ON a2.copies_bookId = a1.bookId
+		INNER JOIN BOOK_LOANS a3 ON a3.loans_bookId = a1.bookId
+		INNER JOIN BORROWER a4 ON a4.cardNo = a3.loans_cardNo
+		WHERE a2.copies_branchId = 1 AND a3.dueDate = '2018-03-19'
 	;
 
 	--> 5. For each library branch, retrieve the branch name and the total number of books loaned out from that branch.
 
 	SELECT
-		branchName AS 'Branch Name:', COUNT(*) AS 'Total # of Loans:'
-		FROM LIBRARY_BRANCH
-		INNER JOIN BOOK_LOANS ON loans_branchId = branchId
-		WHERE loans_branchId = branchId
-		GROUP BY branchName
+		a1.branchName AS 'Branch Name:', COUNT(*) AS 'Total # of Loans:'
+		FROM LIBRARY_BRANCH a1
+		INNER JOIN BOOK_LOANS a2 ON a2.loans_branchId = a1.branchId
+		WHERE a2.loans_branchId = a1.branchId
+		GROUP BY a1.branchName
 	;
 
 	--> 6. Retrieve the names, addresses, and number of books checked out for all borrowers who have more than five books checked out.
 
 	SELECT
-		borrowName AS 'Borrower Name:', borrowAddress AS 'Borrower Address', COUNT(*) AS '# of Books Checked Out'
-		FROM BORROWER
-		INNER JOIN BOOK_LOANS ON loans_cardNo = cardNo
-		WHERE loans_cardNo = cardNo
-		GROUP BY borrowName, borrowAddress
+		a1.borrowName AS 'Borrower Name:', a1.borrowAddress AS 'Borrower Address', COUNT(*) AS '# of Books Checked Out'
+		FROM BORROWER a1
+		INNER JOIN BOOK_LOANS a2 ON a2.loans_cardNo = a1.cardNo
+		WHERE a2.loans_cardNo = a1.cardNo
+		GROUP BY a1.borrowName, a1.borrowAddress
 		HAVING COUNT(*) > 5
 	;
 
@@ -326,11 +320,11 @@ BEGIN
 		  owned by the library branch whose name is "Central".*/
 
 	SELECT
-		bookTitle AS 'Book Title:', branchName AS 'Branch Name:', No_Of_Copies AS '# of copies owned:'
-		FROM BOOK
-		INNER JOIN BOOK_COPIES ON copies_bookId = bookId
-		INNER JOIN LIBRARY_BRANCH ON branchId = copies_branchId
-		WHERE bookAuthor = 'Stephen King' AND branchName = 'Central'
+		a1.bookTitle AS 'Book Title:', a3.branchName AS 'Branch Name:', a2.No_Of_Copies AS '# of copies owned:'
+		FROM BOOK a1
+		INNER JOIN BOOK_COPIES a2 ON a2.copies_bookId = a1.bookId
+		INNER JOIN LIBRARY_BRANCH a3 ON a3.branchId = a2.copies_branchId
+		WHERE a1.bookAuthor = 'Stephen King' AND a3.branchName = 'Central'
 	;
 
 END
